@@ -8,6 +8,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import util.FilenameUtil;
 
 @Controller
 public class DashboardController {
@@ -18,8 +19,12 @@ public class DashboardController {
     @Autowired
     @Qualifier(value = "html")
     private PageSuffixService pageSuffixService;
+
+    @Autowired
+    private FilenameUtil filenameUtil;
+
     @GetMapping(value="/dashboard")
     public String getDashboard(){
-        return dashboardService.getDashboard() + "." + pageSuffixService.getSuffix();
+        return dashboardService.getDashboard() + filenameUtil.getSuffixSeparator() + pageSuffixService.getSuffix();
     }
 }
