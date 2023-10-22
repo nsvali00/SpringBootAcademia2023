@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDate;
 import java.util.Arrays;
@@ -45,18 +46,25 @@ public class FlightService {
     public List<FlightOfferSearch> getFlights(String originLocationCode, String destinationLocationCode, LocalDate departureDate,
                              LocalDate returnDate, Integer adults){
 
-        FlightSearchEntity flightSearchEntity = new FlightSearchEntity();
-        flightSearchEntity.setOriginLocationCode(originLocationCode);
-        flightSearchEntity.setDestinationLocationCode(destinationLocationCode);
-        flightSearchEntity.setDepartureDate(departureDate);
-        flightSearchEntity.setReturnDate(returnDate);
-        flightSearchEntity.setAdults(adults);
+        List<FlightSearchEntity> byFlightSearch = flightSearchRepository.findByFlightSearch(originLocationCode,
+                destinationLocationCode, departureDate, returnDate, adults);
 
-        flightSearchEntity.setUserCreated("ja sam kreirao");
-        flightSearchEntity.setDateCreated(LocalDate.now());
 
-        // spremi u bazu
-        flightSearchRepository.save(flightSearchEntity);
+
+        if(CollectionUtils.isEmpty(byFlightSearch)) {
+            FlightSearchEntity flightSearchEntity = new FlightSearchEntity();
+            flightSearchEntity.setOriginLocationCode(originLocationCode);
+            flightSearchEntity.setDestinationLocationCode(destinationLocationCode);
+            flightSearchEntity.setDepartureDate(departureDate);
+            flightSearchEntity.setReturnDate(returnDate);
+            flightSearchEntity.setAdults(adults);
+
+            flightSearchEntity.setUserCreated("ja sam kreirao");
+            flightSearchEntity.setDateCreated(LocalDate.now());
+
+            // spremi u bazu
+            flightSearchRepository.save(flightSearchEntity);
+        }
 
         Params params = Params
                 .with("originLocationCode", originLocationCode)
