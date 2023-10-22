@@ -7,7 +7,9 @@ import com.amadeus.referencedata.Locations;
 import com.amadeus.resources.FlightOfferSearch;
 import com.amadeus.resources.Location;
 import hr.kingict.springbootakademija2023_2.entity.FlightSearchEntity;
+import hr.kingict.springbootakademija2023_2.mapper.FlightOfferSearchFlightSearchResultEntityMapper;
 import hr.kingict.springbootakademija2023_2.repository.FlightSearchRepository;
+import hr.kingict.springbootakademija2023_2.repository.FlightSearchResultRepository;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,6 +31,12 @@ public class FlightService {
 
     @Autowired
     private FlightSearchRepository flightSearchRepository;
+
+    @Autowired
+    private FlightSearchResultRepository flightSearchResultRepository;
+
+    @Autowired
+    private FlightOfferSearchFlightSearchResultEntityMapper flightSearchResultEntityMapper;
     public List<Location> getAirports(String keyword){
 
         Params params = Params
@@ -51,10 +59,10 @@ public class FlightService {
         List<FlightSearchEntity> byFlightSearch = flightSearchRepository.findByFlightSearch(originLocationCode,
                 destinationLocationCode, departureDate, returnDate, adults);
 
-
+        FlightSearchEntity flightSearchEntity = new FlightSearchEntity();
 
         if(CollectionUtils.isEmpty(byFlightSearch)) {
-            FlightSearchEntity flightSearchEntity = new FlightSearchEntity();
+
             flightSearchEntity.setOriginLocationCode(originLocationCode);
             flightSearchEntity.setDestinationLocationCode(destinationLocationCode);
             flightSearchEntity.setDepartureDate(departureDate);
@@ -80,6 +88,14 @@ public class FlightService {
         FlightOfferSearch[] flightOfferSearches = new FlightOfferSearch[0];
         try {
             flightOfferSearches = amadeus.shopping.flightOffersSearch.get(params);
+
+            Arrays.asList(flightOfferSearches)
+                    .stream()
+                    .map(flightOfferSearch -> flightSearchResultEntityMapper.map(flightOfferSearch))
+                    .forEach(flightSearchResultEntity -> {
+                        flightSearchResultEntity.setFlightSearchEntity(flightSearchEntity);
+                        flightSearchResultRepository.save(flightSearchResultEntity);
+                    });
             return Arrays.asList(flightOfferSearches);
         } catch (Exception e) {
             logger.error("getFlights neka greška: " + e.getMessage(),e);

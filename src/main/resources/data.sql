@@ -22,5 +22,19 @@ CREATE TABLE pretraga_letova
     korisnik_azuriranja VARCHAR(50),
     datum_azuriranja DATE
 
+);
 
-)
+CREATE TABLE rezultati_letova(
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    cijena VARCHAR(20),
+    odlazna_aviokompanija VARCHAR(10),
+    povratna_aviokompanija VARCHAR(10),
+
+    korisnik_kreirao VARCHAR(50),
+    datum_kreiranja DATE,
+    korisnik_azuriranja VARCHAR(50),
+    datum_azuriranja DATE,
+    pretraga_id INT
+);
+
+ALTER TABLE rezultati_letova ADD FOREIGN KEY (pretraga_id) REFERENCES pretraga_letova(id);
