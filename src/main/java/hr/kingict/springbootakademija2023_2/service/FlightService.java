@@ -6,6 +6,8 @@ import com.amadeus.exceptions.ResponseException;
 import com.amadeus.referencedata.Locations;
 import com.amadeus.resources.FlightOfferSearch;
 import com.amadeus.resources.Location;
+import hr.kingict.springbootakademija2023_2.entity.FlightSearchEntity;
+import hr.kingict.springbootakademija2023_2.repository.FlightSearchRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +24,9 @@ public class FlightService {
 
     @Autowired
     private Amadeus amadeus;
+
+    @Autowired
+    private FlightSearchRepository flightSearchRepository;
     public List<Location> getAirports(String keyword){
 
         Params params = Params
@@ -39,6 +44,19 @@ public class FlightService {
 
     public List<FlightOfferSearch> getFlights(String originLocationCode, String destinationLocationCode, LocalDate departureDate,
                              LocalDate returnDate, Integer adults){
+
+        FlightSearchEntity flightSearchEntity = new FlightSearchEntity();
+        flightSearchEntity.setOriginLocationCode(originLocationCode);
+        flightSearchEntity.setDestinationLocationCode(destinationLocationCode);
+        flightSearchEntity.setDepartureDate(departureDate);
+        flightSearchEntity.setReturnDate(returnDate);
+        flightSearchEntity.setAdults(adults);
+
+        flightSearchEntity.setUserCreated("ja sam kreirao");
+        flightSearchEntity.setDateCreated(LocalDate.now());
+
+        // spremi u bazu
+        flightSearchRepository.save(flightSearchEntity);
 
         Params params = Params
                 .with("originLocationCode", originLocationCode)
