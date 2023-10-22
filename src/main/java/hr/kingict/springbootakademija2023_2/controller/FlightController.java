@@ -1,15 +1,17 @@
 package hr.kingict.springbootakademija2023_2.controller;
 
+import com.amadeus.resources.FlightOfferSearch;
 import com.amadeus.resources.Location;
+import hr.kingict.springbootakademija2023_2.dto.FlightSearchDto;
 import hr.kingict.springbootakademija2023_2.dto.LocationDto;
+import hr.kingict.springbootakademija2023_2.form.FlightSearchForm;
 import hr.kingict.springbootakademija2023_2.service.FlightService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
 import java.util.List;
 
 @RestController
@@ -31,5 +33,17 @@ public class FlightController {
         return ResponseEntity
                 .ok()
                 .body(listAirportsDto);
+    }
+
+    @PostMapping(value = "/flights")
+    public ResponseEntity<List<String>> getFlights(@RequestBody @Valid FlightSearchForm flightSearchForm){
+
+        FlightSearchDto flightSearchDto = new FlightSearchDto();
+        List<FlightOfferSearch> flights = flightService.getFlights(flightSearchForm.getOriginLocationCode(),
+                flightSearchForm.getDestinationLocationCode(),
+                flightSearchForm.getDepartureDate(), flightSearchForm.getReturnDate(), flightSearchForm.getAdults());
+        return ResponseEntity
+                .ok()
+                .body(Arrays.asList("flightSearchDto"));
     }
 }
